@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie } from 'recharts';
 
 const QuotaCalculator = () => {
   const [quotas, setQuotas] = useState({
@@ -64,7 +65,12 @@ const QuotaCalculator = () => {
     };
   };
 
-  const metrics = calculateMetrics();
+  // Initialize metrics state with calculated values
+  const [metrics, setMetrics] = useState(calculateMetrics());
+
+  const handleCalculate = () => {
+    setMetrics(calculateMetrics());
+  };
 
   const handleQuotaChange = (field, value) => {
     setQuotas(prev => ({
@@ -170,151 +176,163 @@ const QuotaCalculator = () => {
               </div>
             </div>
           </div>
+          <div className="mt-6 flex justify-end">
+            <Button 
+              onClick={handleCalculate}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+            >
+              Calculate Metrics
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Results Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Daily Requirements (100%)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p>Connected Calls: {metrics.daily.connectedCalls}</p>
-              <p>Emails: {metrics.daily.emails}</p>
-              <p>Booked Meetings: {metrics.daily.bookedMeetings}</p>
-            </div>
-          </CardContent>
-        </Card>
+      {metrics && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Daily Requirements (100%)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p>Connected Calls: {metrics.daily.connectedCalls}</p>
+                  <p>Emails: {metrics.daily.emails}</p>
+                  <p>Booked Meetings: {metrics.daily.bookedMeetings}</p>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Daily Requirements (120%)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p>Connected Calls: {metrics.daily120.connectedCalls}</p>
-              <p>Emails: {metrics.daily120.emails}</p>
-              <p>Booked Meetings: {metrics.daily120.bookedMeetings}</p>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Daily Requirements (120%)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p>Connected Calls: {metrics.daily120.connectedCalls}</p>
+                  <p>Emails: {metrics.daily120.emails}</p>
+                  <p>Booked Meetings: {metrics.daily120.bookedMeetings}</p>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Monthly Projections</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p>Required MRR Deals: {metrics.monthly.deals}</p>
-              <p>Required Attended Meetings: {metrics.monthly.attendedMeetings}</p>
-              <p>Required Booked Meetings: {metrics.monthly.bookedMeetings}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Monthly Projections</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p>Required MRR Deals: {metrics.monthly.deals}</p>
+                  <p>Required Attended Meetings: {metrics.monthly.attendedMeetings}</p>
+                  <p>Required Booked Meetings: {metrics.monthly.bookedMeetings}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Visualization Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Daily Activity Distribution</CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={[
-                  {
-                    name: '100% Target',
-                    'Connected Calls': metrics.daily.connectedCalls,
-                    'Booked Meetings': metrics.daily.bookedMeetings,
-                  },
-                  {
-                    name: '120% Target',
-                    'Connected Calls': metrics.daily120.connectedCalls,
-                    'Booked Meetings': metrics.daily120.bookedMeetings,
-                  },
-                ]}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Connected Calls" fill="#4f46e5" />
-                <Bar dataKey="Booked Meetings" fill="#06b6d4" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          {/* Visualization Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Daily Activity Distribution</CardTitle>
+              </CardHeader>
+              <CardContent className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      {
+                        name: '100% Target',
+                        'Connected Calls': metrics.daily.connectedCalls,
+                        'Booked Meetings': metrics.daily.bookedMeetings,
+                      },
+                      {
+                        name: '120% Target',
+                        'Connected Calls': metrics.daily120.connectedCalls,
+                        'Booked Meetings': metrics.daily120.bookedMeetings,
+                      },
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="Connected Calls" fill="#4f46e5" />
+                    <Bar dataKey="Booked Meetings" fill="#06b6d4" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversion Funnel</CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={[
-                  {
-                    name: 'Connected Calls',
-                    value: metrics.monthly.bookedMeetings / (rates.connectedToMeeting / 100),
-                    fill: '#4f46e5'
-                  },
-                  {
-                    name: 'Booked Meetings',
-                    value: metrics.monthly.bookedMeetings,
-                    fill: '#06b6d4'
-                  },
-                  {
-                    name: 'Attended Meetings',
-                    value: metrics.monthly.attendedMeetings,
-                    fill: '#0891b2'
-                  },
-                  {
-                    name: 'Closed Deals',
-                    value: metrics.monthly.deals,
-                    fill: '#0e7490'
-                  }
-                ]}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" />
-                <Tooltip />
-                <Bar dataKey="value" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Conversion Funnel</CardTitle>
+              </CardHeader>
+              <CardContent className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      {
+                        name: 'Connected Calls',
+                        value: metrics.monthly.bookedMeetings / (rates.connectedToMeeting / 100),
+                        fill: '#4f46e5'
+                      },
+                      {
+                        name: 'Booked Meetings',
+                        value: metrics.monthly.bookedMeetings,
+                        fill: '#06b6d4'
+                      },
+                      {
+                        name: 'Attended Meetings',
+                        value: metrics.monthly.attendedMeetings,
+                        fill: '#0891b2'
+                      },
+                      {
+                        name: 'Closed Deals',
+                        value: metrics.monthly.deals,
+                        fill: '#0e7490'
+                      }
+                    ]}
+                    layout="vertical"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" />
+                    <Tooltip />
+                    <Bar dataKey="value" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Quota Composition</CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Pipe Build', value: 50, fill: '#4f46e5' },
-                    { name: 'Meetings Held', value: 30, fill: '#06b6d4' },
-                    { name: 'CW MRR', value: 20, fill: '#0891b2' }
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label={({ name, value }) => `${name}: ${value}%`}
-                />
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Quota Composition</CardTitle>
+              </CardHeader>
+              <CardContent className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Pipe Build', value: 50, fill: '#4f46e5' },
+                        { name: 'Meetings Held', value: 30, fill: '#06b6d4' },
+                        { name: 'CW MRR', value: 20, fill: '#0891b2' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label={({ name, value }) => `${name}: ${value}%`}
+                    />
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 };
